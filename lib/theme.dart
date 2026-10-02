@@ -32,6 +32,15 @@ ThemeData buildTheme() {
       backgroundColor: AppColors.card,
       showDragHandle: true,
     ),
+    dialogTheme: const DialogThemeData(backgroundColor: AppColors.card),
+    chipTheme: ChipThemeData(
+      selectedColor: AppColors.accent,
+      backgroundColor: AppColors.slot,
+      side: const BorderSide(color: AppColors.cardBorder),
+      checkmarkColor: Colors.white,
+      labelStyle: const TextStyle(color: Colors.white),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.slot,

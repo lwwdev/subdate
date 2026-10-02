@@ -285,6 +285,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
               trailing: const Icon(Icons.edit_calendar_rounded),
               onTap: _pickDate,
             ),
+            const SizedBox(height: 8),
             DropdownButtonFormField<int>(
               initialValue: _remindOptions.containsKey(_remind) ? _remind : 1,
               decoration: const InputDecoration(labelText: 'Remind me'),
