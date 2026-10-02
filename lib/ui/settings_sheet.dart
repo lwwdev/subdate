@@ -110,6 +110,16 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
             onChanged: (v) => notifier.update(settings.copyWith(upcomingDays: v)),
           ),
           const SizedBox(height: 12),
+          DropdownButtonFormField<int>(
+            initialValue: settings.weekStart,
+            decoration: const InputDecoration(labelText: 'Week starts on'),
+            items: const [
+              DropdownMenuItem(value: DateTime.monday, child: Text('Monday')),
+              DropdownMenuItem(value: DateTime.sunday, child: Text('Sunday')),
+            ],
+            onChanged: (v) => notifier.update(settings.copyWith(weekStart: v)),
+          ),
+          const SizedBox(height: 12),
           if (!kIsWeb) ...[
             DropdownButtonFormField<int>(
               initialValue: remindOptions.containsKey(settings.defaultRemind) ? settings.defaultRemind : 1,

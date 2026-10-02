@@ -59,4 +59,13 @@ void main() {
     expect(relativeLabel(DateTime(2026, 10, 3), now), 'tomorrow');
     expect(relativeLabel(DateTime(2026, 10, 7), now), 'in 5 days');
   });
+
+  test('calendar blanks', () {
+    // oct 1 2026 is a thursday
+    expect(leadingBlanks(DateTime(2026, 10), DateTime.monday), 3);
+    expect(leadingBlanks(DateTime(2026, 10), DateTime.sunday), 4);
+    // feb 1 2026 is a sunday
+    expect(leadingBlanks(DateTime(2026, 2), DateTime.sunday), 0);
+    expect(leadingBlanks(DateTime(2026, 2), DateTime.monday), 6);
+  });
 }
