@@ -11,6 +11,15 @@ extension CadenceLabel on Cadence {
       };
 }
 
+const remindOptions = {
+  -1: 'Off',
+  0: 'Same day',
+  1: '1 day before',
+  2: '2 days before',
+  3: '3 days before',
+  7: '1 week before',
+};
+
 class Subscription {
   final String id;
   final String name;
