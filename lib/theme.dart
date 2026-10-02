@@ -15,7 +15,7 @@ class AppColors {
   static const pill = Color(0xFF0D1020);
 }
 
-ThemeData buildTheme() {
+ThemeData buildTheme({bool googleFonts = true}) {
   final base = ThemeData(
     brightness: Brightness.dark,
     useMaterial3: true,
@@ -27,7 +27,7 @@ ThemeData buildTheme() {
     ),
   );
   return base.copyWith(
-    textTheme: GoogleFonts.interTextTheme(base.textTheme),
+    textTheme: googleFonts ? GoogleFonts.interTextTheme(base.textTheme) : base.textTheme,
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: AppColors.card,
       showDragHandle: true,

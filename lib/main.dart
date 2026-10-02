@@ -23,14 +23,15 @@ Future<void> main() async {
 }
 
 class SubdateApp extends StatelessWidget {
-  const SubdateApp({super.key});
+  final ThemeData? theme; // tests pass a plain one so google_fonts doesnt hit the network
+  const SubdateApp({super.key, this.theme});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'subdate',
       debugShowCheckedModeBanner: false,
-      theme: buildTheme(),
+      theme: theme ?? buildTheme(),
       home: const HomeScreen(),
     );
   }
