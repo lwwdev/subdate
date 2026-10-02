@@ -28,6 +28,7 @@ class _ComingUpSectionState extends ConsumerState<ComingUpSection> {
     final items = ref.watch(upcomingProvider);
     final total = ref.watch(upcomingTotalProvider);
     final home = ref.watch(settingsProvider).homeCurrency;
+    final days = ref.watch(settingsProvider).upcomingDays;
     final now = ref.watch(nowProvider);
     final fx = ref.watch(fxProvider);
     final open = _open.clamp(0, max(0, items.length - 1));
@@ -47,7 +48,7 @@ class _ComingUpSectionState extends ConsumerState<ComingUpSection> {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    'Next 7 days, ${money(total, home)}',
+                    'Next $days days, ${money(total, home)}',
                     style: const TextStyle(color: AppColors.muted, fontSize: 14),
                   ),
                 ),
@@ -284,7 +285,7 @@ class _Empty extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: AppColors.cardBorder),
       ),
-      child: const Text('nothing due this week 🎉', style: TextStyle(color: AppColors.muted, fontSize: 16)),
+      child: const Text('nothing due soon 🎉', style: TextStyle(color: AppColors.muted, fontSize: 16)),
     );
   }
 }

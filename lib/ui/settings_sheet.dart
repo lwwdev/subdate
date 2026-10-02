@@ -98,6 +98,17 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
             onChanged: (v) => notifier.update(settings.copyWith(homeCurrency: v)),
           ),
           const SizedBox(height: 12),
+          DropdownButtonFormField<int>(
+            initialValue: const [7, 14, 30].contains(settings.upcomingDays) ? settings.upcomingDays : 7,
+            decoration: const InputDecoration(labelText: 'Coming up shows'),
+            items: const [
+              DropdownMenuItem(value: 7, child: Text('Next 7 days')),
+              DropdownMenuItem(value: 14, child: Text('Next 14 days')),
+              DropdownMenuItem(value: 30, child: Text('Next 30 days')),
+            ],
+            onChanged: (v) => notifier.update(settings.copyWith(upcomingDays: v)),
+          ),
+          const SizedBox(height: 12),
           if (!kIsWeb) ...[
             DropdownButtonFormField<int>(
               initialValue: remindOptions.containsKey(settings.defaultRemind) ? settings.defaultRemind : 1,
