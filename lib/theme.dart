@@ -33,7 +33,15 @@ ThemeData buildTheme({bool googleFonts = true}) {
       showDragHandle: true,
     ),
     dialogTheme: const DialogThemeData(backgroundColor: AppColors.card),
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith(
+          (st) => st.contains(WidgetState.selected) ? Colors.white : AppColors.muted),
+      trackColor: WidgetStateProperty.resolveWith(
+          (st) => st.contains(WidgetState.selected) ? AppColors.accent : AppColors.slot),
+    ),
     chipTheme: ChipThemeData(
+      showCheckmark: false,
+      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
       selectedColor: AppColors.accent,
       backgroundColor: AppColors.slot,
       side: const BorderSide(color: AppColors.cardBorder),
