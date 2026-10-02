@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'data/providers.dart';
 import 'data/storage.dart';
+import 'services/notifications.dart';
 import 'theme.dart';
 import 'ui/home_screen.dart';
 
@@ -10,8 +11,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = Storage();
   await storage.init();
+  final notifications = Notifications();
+  await notifications.init();
   runApp(ProviderScope(
-    overrides: [storageProvider.overrideWithValue(storage)],
+    overrides: [
+      storageProvider.overrideWithValue(storage),
+      notificationsProvider.overrideWithValue(notifications),
+    ],
     child: const SubdateApp(),
   ));
 }
