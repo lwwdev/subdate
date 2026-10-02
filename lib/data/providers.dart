@@ -105,7 +105,8 @@ final upcomingProvider = Provider<List<Upcoming>>((ref) {
   final end = now.add(const Duration(days: 6));
   final out = <Upcoming>[
     for (final s in ref.watch(subsProvider))
-      for (final d in occurrencesInRange(s, now, end)) Upcoming(s, d),
+      if (!s.paused)
+        for (final d in occurrencesInRange(s, now, end)) Upcoming(s, d),
   ];
   out.sort((a, b) {
     final c = a.date.compareTo(b.date);
@@ -128,6 +129,7 @@ final monthPaymentsProvider = Provider.family<Map<int, List<Subscription>>, Date
   final last = DateTime(month.year, month.month + 1, 0);
   final out = <int, List<Subscription>>{};
   for (final s in ref.watch(subsProvider)) {
+    if (s.paused) continue;
     for (final d in occurrencesInRange(s, first, last)) {
       out.putIfAbsent(d.day, () => []).add(s);
     }

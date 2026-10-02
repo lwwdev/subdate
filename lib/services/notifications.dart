@@ -20,7 +20,7 @@ List<Reminder> planReminders(List<Subscription> subs, DateTime now, int hour, {i
   final out = <Reminder>[];
   final horizon = now.add(const Duration(days: 120));
   for (final s in subs) {
-    if (s.remindDaysBefore < 0) continue;
+    if (s.remindDaysBefore < 0 || s.paused) continue;
     for (final d in occurrencesInRange(s, now, horizon.add(Duration(days: s.remindDaysBefore)))) {
       final fire = DateTime(d.year, d.month, d.day - s.remindDaysBefore, hour);
       if (fire.isAfter(now) && fire.isBefore(horizon)) out.add(Reminder(s, d, fire));
@@ -33,7 +33,11 @@ List<Reminder> planReminders(List<Subscription> subs, DateTime now, int hour, {i
 String reminderText(Reminder r) {
   final days = dateOnly(r.renewal).difference(dateOnly(r.fireAt)).inDays;
   final when = switch (days) { 0 => 'today', 1 => 'tomorrow', _ => 'in $days days' };
-  return '${r.sub.name} renews $when · ${money(r.sub.amount, r.sub.currency)}';
+  final price = money(r.sub.amount, r.sub.currency);
+  if (r.sub.trial && dateOnly(r.renewal) == dateOnly(r.sub.startDate)) {
+    return '${r.sub.name} trial ends $when, cancel or pay $price';
+  }
+  return '${r.sub.name} renews $when · $price';
 }
 
 class Notifications {

@@ -33,6 +33,8 @@ class Subscription {
   final int? color;
   final int remindDaysBefore; // -1 = off
   final String notes;
+  final bool trial; // startDate is when the trial ends / first real charge
+  final bool paused;
 
   const Subscription({
     required this.id,
@@ -47,7 +49,12 @@ class Subscription {
     this.color,
     this.remindDaysBefore = 1,
     this.notes = '',
+    this.trial = false,
+    this.paused = false,
   });
+
+  bool inTrial(DateTime now) =>
+      trial && !DateTime(startDate.year, startDate.month, startDate.day).isBefore(DateTime(now.year, now.month, now.day));
 
   Subscription copyWith({
     String? name,
@@ -61,6 +68,8 @@ class Subscription {
     int? color,
     int? remindDaysBefore,
     String? notes,
+    bool? trial,
+    bool? paused,
     bool clearImage = false,
     bool clearBrand = false,
   }) {
@@ -77,6 +86,8 @@ class Subscription {
       color: color ?? this.color,
       remindDaysBefore: remindDaysBefore ?? this.remindDaysBefore,
       notes: notes ?? this.notes,
+      trial: trial ?? this.trial,
+      paused: paused ?? this.paused,
     );
   }
 
@@ -93,6 +104,8 @@ class Subscription {
         'color': color,
         'remind': remindDaysBefore,
         'notes': notes,
+        'trial': trial,
+        'paused': paused,
       };
 
   factory Subscription.fromMap(Map m) => Subscription(
@@ -108,5 +121,7 @@ class Subscription {
         color: m['color'] as int?,
         remindDaysBefore: (m['remind'] as int?) ?? 1,
         notes: (m['notes'] as String?) ?? '',
+        trial: (m['trial'] as bool?) ?? false,
+        paused: (m['paused'] as bool?) ?? false,
       );
 }
