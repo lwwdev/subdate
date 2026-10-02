@@ -44,10 +44,11 @@ class _ComingUpSectionState extends ConsumerState<ComingUpSection> {
               collapsed: _collapsed,
               onTap: () => setState(() => _collapsed = !_collapsed),
             ),
-            const Spacer(),
-            Flexible(
+            const SizedBox(width: 12),
+            Expanded(
               child: Text(
                 'Next 7 days, ${money(total, home)}',
+                textAlign: TextAlign.right,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: AppColors.muted, fontSize: 15),
               ),
