@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../logic/fx.dart';
@@ -11,9 +13,27 @@ final notificationsProvider = Provider<Notifications>((ref) => Notifications());
 
 // bumped when the app resumes so "today" doesnt get stuck overnight
 class NowNotifier extends Notifier<DateTime> {
+  Timer? _midnight;
+
   @override
-  DateTime build() => DateTime.now();
-  void tick() => state = DateTime.now();
+  DateTime build() {
+    ref.onDispose(() => _midnight?.cancel());
+    final now = DateTime.now();
+    _schedule(now);
+    return now;
+  }
+
+  // also flip over at midnight if the app is just left open
+  void _schedule(DateTime now) {
+    _midnight?.cancel();
+    final next = DateTime(now.year, now.month, now.day + 1, 0, 0, 5);
+    _midnight = Timer(next.difference(now), tick);
+  }
+
+  void tick() {
+    state = DateTime.now();
+    _schedule(state);
+  }
 }
 
 final nowProvider = NotifierProvider<NowNotifier, DateTime>(NowNotifier.new);
