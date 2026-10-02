@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -143,7 +144,10 @@ class _UpcomingCard extends StatelessWidget {
     final trialEnd = s.trial && dateOnly(item.date) == dateOnly(s.startDate);
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
       child: Container(
         padding: EdgeInsets.fromLTRB(16, 16, 16, last ? 18 : 40),
         decoration: BoxDecoration(
