@@ -9,6 +9,7 @@ Future<Brand?> pickBrand(BuildContext context) {
   return showModalBottomSheet<Brand>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     builder: (_) => const _BrandPicker(),
   );
 }
