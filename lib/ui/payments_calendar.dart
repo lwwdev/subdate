@@ -49,10 +49,10 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
         if (v.abs() > 200) _shift(v < 0 ? 1 : -1);
       },
       child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
+        padding: const EdgeInsets.fromLTRB(14, 20, 14, 14),
         decoration: BoxDecoration(
           color: AppColors.card.withValues(alpha: 0.85),
-          borderRadius: BorderRadius.circular(34),
+          borderRadius: BorderRadius.circular(28),
           border: Border.all(color: AppColors.cardBorder),
         ),
         child: Column(
@@ -60,42 +60,42 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
           children: [
             Row(
               children: [
-                const Icon(Icons.calendar_month_rounded, size: 22),
-                const SizedBox(width: 12),
-                const Text('Payments', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w600)),
+                const Icon(Icons.calendar_month_rounded, size: 19),
+                const SizedBox(width: 10),
+                const Text('Payments', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 if (monthTotal > 0)
                   Text(money(monthTotal, home),
-                      style: const TextStyle(color: AppColors.muted, fontSize: 14)),
+                      style: const TextStyle(color: AppColors.muted, fontSize: 13)),
               ],
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: Text(monthTitle(_month),
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
+                      style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w700)),
                 ),
                 _NavButton(icon: Icons.chevron_left_rounded, onTap: () => _shift(-1)),
                 const SizedBox(width: 12),
                 _NavButton(icon: Icons.chevron_right_rounded, onTap: () => _shift(1)),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
             Row(
               children: [
                 for (final d in const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
                   Expanded(
                     child: Text(d,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.muted, fontSize: 15, fontWeight: FontWeight.w500)),
+                        style: const TextStyle(color: AppColors.muted, fontSize: 12.5, fontWeight: FontWeight.w500)),
                   ),
               ],
             ),
             const SizedBox(height: 12),
             for (var r = 0; r < rows; r++)
               Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
                     for (var c = 0; c < 7; c++)
@@ -128,11 +128,11 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
           Text('$day',
               style: TextStyle(
                   color: numColor,
-                  fontSize: 15,
+                  fontSize: 12.5,
                   fontWeight: isToday ? FontWeight.w700 : FontWeight.w500)),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           LayoutBuilder(builder: (context, c) {
-            final size = (c.maxWidth - 6).clamp(24.0, 64.0);
+            final size = (c.maxWidth - 8).clamp(24.0, 56.0);
             return Container(
               width: size,
               height: size,
@@ -186,14 +186,14 @@ class _NavButton extends StatelessWidget {
       onTap: onTap,
       radius: 26,
       child: Container(
-        width: 46,
-        height: 46,
+        width: 38,
+        height: 38,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: AppColors.slot,
           border: Border.all(color: AppColors.cardBorder),
         ),
-        child: Icon(icon, color: AppColors.accent, size: 28),
+        child: Icon(icon, color: AppColors.accent, size: 24),
       ),
     );
   }
