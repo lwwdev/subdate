@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../data/backup.dart';
 import '../data/providers.dart';
 import '../models/subscription.dart';
 import '../theme.dart';
@@ -24,6 +26,56 @@ class SettingsSheet extends ConsumerStatefulWidget {
 
 class _SettingsSheetState extends ConsumerState<SettingsSheet> {
   bool _refreshing = false;
+
+  // snackbars end up behind the sheet so close it first
+  void _toast(String msg) {
+    if (!mounted) return;
+    final m = ScaffoldMessenger.of(context);
+    Navigator.pop(context);
+    m.showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  Future<void> _copyBackup() async {
+    await Clipboard.setData(ClipboardData(text: exportBackup(ref.read(subsProvider))));
+    _toast('copied');
+  }
+
+  Future<void> _restore() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    try {
+      final subs = importBackup(data?.text ?? '');
+      final notifier = ref.read(subsProvider.notifier);
+      for (final s in subs) {
+        await notifier.save(s);
+      }
+      _toast('restored ${subs.length} subs');
+    } catch (_) {
+      _toast("clipboard doesn't look like a subdate backup");
+    }
+  }
+
+  Future<void> _wipe() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Delete everything?'),
+        content: const Text("can't undo this, copy a backup first if you care"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(c, true),
+            child: const Text('Delete', style: TextStyle(color: AppColors.red)),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    final notifier = ref.read(subsProvider.notifier);
+    for (final s in [...ref.read(subsProvider)]) {
+      await notifier.remove(s.id);
+    }
+    if (mounted) Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +138,28 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
           const SizedBox(height: 8),
           const Text('rates from the ECB via frankfurter.dev, good enough for a rough total',
               style: TextStyle(color: AppColors.muted, fontSize: 12)),
+          const SizedBox(height: 20),
+          const Divider(color: AppColors.cardBorder),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.copy_rounded),
+            title: const Text('Copy backup'),
+            subtitle: const Text('everything as json, paste it somewhere safe',
+                style: TextStyle(color: AppColors.muted)),
+            onTap: _copyBackup,
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.paste_rounded),
+            title: const Text('Restore from clipboard'),
+            onTap: _restore,
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.delete_outline_rounded, color: AppColors.red),
+            title: const Text('Delete everything', style: TextStyle(color: AppColors.red)),
+            onTap: _wipe,
+          ),
         ],
       ),
     );
