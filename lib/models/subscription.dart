@@ -33,6 +33,7 @@ class Subscription {
   final int? color;
   final int remindDaysBefore; // -1 = off
   final String notes;
+  final String? category; // Category.name, null = guess from brand
   final bool trial; // startDate is when the trial ends / first real charge
   final bool paused;
 
@@ -51,6 +52,7 @@ class Subscription {
     this.notes = '',
     this.trial = false,
     this.paused = false,
+    this.category,
   });
 
   bool inTrial(DateTime now) =>
@@ -70,6 +72,7 @@ class Subscription {
     String? notes,
     bool? trial,
     bool? paused,
+    String? category,
     bool clearImage = false,
     bool clearBrand = false,
   }) {
@@ -88,6 +91,7 @@ class Subscription {
       notes: notes ?? this.notes,
       trial: trial ?? this.trial,
       paused: paused ?? this.paused,
+      category: category ?? this.category,
     );
   }
 
@@ -106,6 +110,7 @@ class Subscription {
         'notes': notes,
         'trial': trial,
         'paused': paused,
+        'category': category,
       };
 
   factory Subscription.fromMap(Map m) => Subscription(
@@ -123,5 +128,6 @@ class Subscription {
         notes: (m['notes'] as String?) ?? '',
         trial: (m['trial'] as bool?) ?? false,
         paused: (m['paused'] as bool?) ?? false,
+        category: m['category'] as String?,
       );
 }
