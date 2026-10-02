@@ -55,7 +55,7 @@ ThemeData buildTheme() {
 // the little uppercase labels like RENEWS / AMOUNT
 const labelStyle = TextStyle(
   color: AppColors.muted,
-  fontSize: 12,
-  letterSpacing: 2,
+  fontSize: 10.5,
+  letterSpacing: 1.8,
   fontWeight: FontWeight.w500,
 );
