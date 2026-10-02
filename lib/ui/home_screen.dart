@@ -106,6 +106,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           ? null
           : FloatingActionButton(
               onPressed: _edit,
+              tooltip: 'Add subscription',
               backgroundColor: AppColors.accent,
               foregroundColor: Colors.white,
               shape: const CircleBorder(),
@@ -122,6 +123,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 const Spacer(),
                 IconButton(
                   onPressed: () => showSettingsSheet(context),
+                  tooltip: 'Settings',
                   icon: const Icon(Icons.tune_rounded, color: AppColors.muted, size: 20),
                 ),
               ],

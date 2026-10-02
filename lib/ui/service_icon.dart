@@ -27,17 +27,22 @@ class ServiceIcon extends StatelessWidget {
       );
     }
 
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: radius,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+    return Semantics(
+      label: sub.name,
+      image: true,
+      excludeSemantics: true,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: radius,
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        alignment: Alignment.center,
+        child: child,
       ),
-      clipBehavior: Clip.antiAlias,
-      alignment: Alignment.center,
-      child: child,
     );
   }
 }

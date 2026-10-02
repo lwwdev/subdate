@@ -29,10 +29,10 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
   }
 
   void _shift(int by) => setState(() {
-        HapticFeedback.selectionClick();
-        _dir = by.sign;
-        _month = DateTime(_month.year, _month.month + by);
-      });
+    HapticFeedback.selectionClick();
+    _dir = by.sign;
+    _month = DateTime(_month.year, _month.month + by);
+  });
 
   void _goToday() {
     final now = DateTime.now();
@@ -50,9 +50,7 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
     final today = dateOnly(ref.watch(nowProvider));
     final fx = ref.watch(fxProvider);
     final home = ref.watch(settingsProvider).homeCurrency;
-    final monthTotal = payments.values
-        .expand((l) => l)
-        .fold(0.0, (t, s) => t + fx.convert(s.amount, s.currency, home));
+    final monthTotal = payments.values.expand((l) => l).fold(0.0, (t, s) => t + fx.convert(s.amount, s.currency, home));
 
     final daysInMonth = DateTime(_month.year, _month.month + 1, 0).day;
     final weekStart = ref.watch(settingsProvider.select((s) => s.weekStart));
@@ -84,8 +82,7 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
                 const Text('Payments', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 if (monthTotal > 0)
-                  Text(money(monthTotal, home),
-                      style: const TextStyle(color: AppColors.muted, fontSize: 13)),
+                  Text(money(monthTotal, home), style: const TextStyle(color: AppColors.muted, fontSize: 13)),
               ],
             ),
             const SizedBox(height: 16),
@@ -105,9 +102,9 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
                     ),
                   ),
                 ),
-                _NavButton(icon: Icons.chevron_left_rounded, onTap: () => _shift(-1)),
+                _NavButton(icon: Icons.chevron_left_rounded, label: 'previous month', onTap: () => _shift(-1)),
                 const SizedBox(width: 12),
-                _NavButton(icon: Icons.chevron_right_rounded, onTap: () => _shift(1)),
+                _NavButton(icon: Icons.chevron_right_rounded, label: 'next month', onTap: () => _shift(1)),
               ],
             ),
             const SizedBox(height: 14),
@@ -115,9 +112,11 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
               children: [
                 for (final d in dayNames)
                   Expanded(
-                    child: Text(d,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.muted, fontSize: 12.5, fontWeight: FontWeight.w500)),
+                    child: Text(
+                      d,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: AppColors.muted, fontSize: 12.5, fontWeight: FontWeight.w500),
+                    ),
                   ),
               ],
             ),
@@ -138,10 +137,8 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
                     ),
                   );
                 },
-                layoutBuilder: (current, previous) => Stack(
-                  alignment: Alignment.topCenter,
-                  children: [...previous, ?current],
-                ),
+                layoutBuilder: (current, previous) =>
+                    Stack(alignment: Alignment.topCenter, children: [...previous, ?current]),
                 child: Column(
                   key: ValueKey(_month),
                   children: [
@@ -173,59 +170,71 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
     final numColor = isToday
         ? AppColors.accent
         : subs.isNotEmpty
-            ? AppColors.text
-            : AppColors.dim;
+        ? AppColors.text
+        : AppColors.dim;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: subs.isEmpty ? null : () => widget.onDayTap(date, subs),
-      child: Column(
-        children: [
-          Text('$day',
+    return Semantics(
+      button: subs.isNotEmpty,
+      label: subs.isEmpty ? longDate(date) : '${longDate(date)}, ${subs.map((s) => s.name).join(', ')}',
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: subs.isEmpty ? null : () => widget.onDayTap(date, subs),
+        child: Column(
+          children: [
+            Text(
+              '$day',
               style: TextStyle(
-                  color: numColor,
-                  fontSize: 12.5,
-                  fontWeight: isToday ? FontWeight.w700 : FontWeight.w500)),
-          const SizedBox(height: 4),
-          LayoutBuilder(builder: (context, c) {
-            final size = (c.maxWidth - 8).clamp(24.0, 56.0);
-            return Container(
-              width: size,
-              height: size,
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(size * 0.26),
-                color: subs.isEmpty ? AppColors.slot.withValues(alpha: 0.35) : AppColors.slot,
-                border: Border.all(
-                  color: isToday ? AppColors.accent : Colors.white.withValues(alpha: 0.04),
-                  width: isToday ? 2 : 1,
-                ),
+                color: numColor,
+                fontSize: 12.5,
+                fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
               ),
-              child: subs.isEmpty
-                  ? null
-                  : Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Positioned.fill(child: ServiceIcon(subs.first, size: size - 8)),
-                        if (subs.length > 1)
-                          Positioned(
-                            right: -6,
-                            top: -6,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                              decoration: BoxDecoration(
-                                color: AppColors.accent,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text('+${subs.length - 1}',
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                            ),
-                          ),
-                      ],
+            ),
+            const SizedBox(height: 4),
+            LayoutBuilder(
+              builder: (context, c) {
+                final size = (c.maxWidth - 8).clamp(24.0, 56.0);
+                return Container(
+                  width: size,
+                  height: size,
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(size * 0.26),
+                    color: subs.isEmpty ? AppColors.slot.withValues(alpha: 0.35) : AppColors.slot,
+                    border: Border.all(
+                      color: isToday ? AppColors.accent : Colors.white.withValues(alpha: 0.04),
+                      width: isToday ? 2 : 1,
                     ),
-            );
-          }),
-        ],
+                  ),
+                  child: subs.isEmpty
+                      ? null
+                      : Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Positioned.fill(child: ServiceIcon(subs.first, size: size - 8)),
+                            if (subs.length > 1)
+                              Positioned(
+                                right: -6,
+                                top: -6,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.accent,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    '+${subs.length - 1}',
+                                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -233,23 +242,28 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
 
 class _NavButton extends StatelessWidget {
   final IconData icon;
+  final String label;
   final VoidCallback onTap;
-  const _NavButton({required this.icon, required this.onTap});
+  const _NavButton({required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return InkResponse(
-      onTap: onTap,
-      radius: 26,
-      child: Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppColors.slot,
-          border: Border.all(color: AppColors.cardBorder),
+    return Semantics(
+      button: true,
+      label: label,
+      child: InkResponse(
+        onTap: onTap,
+        radius: 26,
+        child: Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.slot,
+            border: Border.all(color: AppColors.cardBorder),
+          ),
+          child: Icon(icon, color: AppColors.accent, size: 24),
         ),
-        child: Icon(icon, color: AppColors.accent, size: 24),
       ),
     );
   }
