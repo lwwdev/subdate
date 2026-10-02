@@ -37,13 +37,9 @@ class _ComingUpSectionState extends ConsumerState<ComingUpSection> {
       children: [
         Row(
           children: [
-            const Text('Coming up',
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
+            const Text('Coming up', style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
             const SizedBox(width: 8),
-            _ChevronButton(
-              collapsed: _collapsed,
-              onTap: () => setState(() => _collapsed = !_collapsed),
-            ),
+            _ChevronButton(collapsed: _collapsed, onTap: () => setState(() => _collapsed = !_collapsed)),
             const SizedBox(width: 12),
             Expanded(
               child: Align(
@@ -67,28 +63,26 @@ class _ComingUpSectionState extends ConsumerState<ComingUpSection> {
           child: _collapsed
               ? const SizedBox(width: double.infinity)
               : items.isEmpty
-                  ? const _Empty()
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        for (var i = 0; i < items.length; i++)
-                          _Overlap(
-                            overlap: i == items.length - 1 ? 0 : 24,
-                            child: _UpcomingCard(
-                              item: items[i],
-                              now: now,
-                              expanded: i == open,
-                              last: i == items.length - 1,
-                              amountHint: items[i].sub.currency == home
-                                  ? null
-                                  : '≈ ${money(fx.convert(items[i].sub.amount, items[i].sub.currency, home), home)}',
-                              onTap: () => i == open
-                                  ? widget.onEdit(items[i].sub)
-                                  : setState(() => _open = i),
-                            ),
-                          ),
-                      ],
-                    ),
+              ? const _Empty()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var i = 0; i < items.length; i++)
+                      _Overlap(
+                        overlap: i == items.length - 1 ? 0 : 24,
+                        child: _UpcomingCard(
+                          item: items[i],
+                          now: now,
+                          expanded: i == open,
+                          last: i == items.length - 1,
+                          amountHint: items[i].sub.currency == home
+                              ? null
+                              : '≈ ${money(fx.convert(items[i].sub.amount, items[i].sub.currency, home), home)}',
+                          onTap: () => i == open ? widget.onEdit(items[i].sub) : setState(() => _open = i),
+                        ),
+                      ),
+                  ],
+                ),
         ),
       ],
     );
@@ -145,6 +139,7 @@ class _UpcomingCard extends StatelessWidget {
     final s = item.sub;
     final tint = tintFor(s);
     final isToday = dateOnly(item.date) == dateOnly(now);
+    final trialEnd = s.trial && dateOnly(item.date) == dateOnly(s.startDate);
 
     return GestureDetector(
       onTap: onTap,
@@ -156,14 +151,9 @@ class _UpcomingCard extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color.lerp(AppColors.card, tint, 0.28)!,
-              AppColors.card,
-            ],
+            colors: [Color.lerp(AppColors.card, tint, 0.28)!, AppColors.card],
           ),
-          boxShadow: const [
-            BoxShadow(color: Color(0x66000000), blurRadius: 24, offset: Offset(0, -6)),
-          ],
+          boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 24, offset: Offset(0, -6))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,19 +163,42 @@ class _UpcomingCard extends StatelessWidget {
                 ServiceIcon(s, size: 38),
                 const SizedBox(width: 14),
                 Expanded(
-                  child: Text(s.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          s.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      if (trialEnd) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.accent),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            'TRIAL',
+                            style: TextStyle(
+                              fontSize: 10,
+                              letterSpacing: 1,
+                              color: AppColors.accent,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: AppColors.pill,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(dayPill(item.date),
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                  decoration: BoxDecoration(color: AppColors.pill, borderRadius: BorderRadius.circular(20)),
+                  child: Text(dayPill(item.date), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
@@ -199,28 +212,26 @@ class _UpcomingCard extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 20),
                       child: Column(
                         children: [
-                          Row(children: [
-                            _Field(
-                              label: 'RENEWS',
-                              value: relativeLabel(item.date, now),
-                              color: isToday ? AppColors.red : null,
-                            ),
-                            _Field(
-                              label: 'AMOUNT',
-                              value: money(s.amount, s.currency),
-                              hint: amountHint,
-                            ),
-                          ]),
+                          Row(
+                            children: [
+                              _Field(
+                                label: trialEnd ? 'TRIAL ENDS' : 'RENEWS',
+                                value: relativeLabel(item.date, now),
+                                color: isToday ? AppColors.red : null,
+                              ),
+                              _Field(label: 'AMOUNT', value: money(s.amount, s.currency), hint: amountHint),
+                            ],
+                          ),
                           const SizedBox(height: 16),
-                          Row(children: [
-                            _Field(
-                              label: 'CADENCE',
-                              value: s.every == 1
-                                  ? s.cadence.label
-                                  : '${s.cadence.label} ×${s.every}',
-                            ),
-                            _Field(label: 'DATE', value: longDate(item.date)),
-                          ]),
+                          Row(
+                            children: [
+                              _Field(
+                                label: 'CADENCE',
+                                value: s.every == 1 ? s.cadence.label : '${s.cadence.label} ×${s.every}',
+                              ),
+                              _Field(label: 'DATE', value: longDate(item.date)),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -248,12 +259,13 @@ class _Field extends StatelessWidget {
         children: [
           Text(label, style: labelStyle),
           const SizedBox(height: 4),
-          Text(value,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 19, fontWeight: FontWeight.w500, color: color)),
-          if (hint != null)
-            Text(hint!, style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 19, fontWeight: FontWeight.w500, color: color),
+          ),
+          if (hint != null) Text(hint!, style: const TextStyle(color: AppColors.muted, fontSize: 12)),
         ],
       ),
     );
@@ -272,8 +284,7 @@ class _Empty extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: AppColors.cardBorder),
       ),
-      child: const Text('nothing due this week 🎉',
-          style: TextStyle(color: AppColors.muted, fontSize: 16)),
+      child: const Text('nothing due this week 🎉', style: TextStyle(color: AppColors.muted, fontSize: 16)),
     );
   }
 }
