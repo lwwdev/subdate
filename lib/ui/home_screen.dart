@@ -116,7 +116,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 560),
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
                 children: [
                   if (subs.isEmpty)
                     _FirstRun(onSample: () async {
@@ -125,13 +125,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                       }
                     }, onAdd: _edit)
                   else ...[
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: IconButton(
-                        onPressed: () => showSettingsSheet(context),
-                        icon: const Icon(Icons.tune_rounded, color: AppColors.muted),
-                      ),
+                    Row(
+                      children: [
+                        const Text('subdate',
+                            style: TextStyle(color: AppColors.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: () => showSettingsSheet(context),
+                          icon: const Icon(Icons.tune_rounded, color: AppColors.muted, size: 20),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 4),
                     ComingUpSection(onEdit: _edit),
                     const SizedBox(height: 28),
                     PaymentsCalendar(onDayTap: _showDay),
