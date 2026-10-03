@@ -3,10 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/providers.dart';
 import '../data/sample.dart';
+import '../format.dart';
 import '../models/subscription.dart';
 import '../theme.dart';
 import 'coming_up_section.dart';
+import 'edit_subscription_sheet.dart';
 import 'payments_calendar.dart';
+import 'service_icon.dart';
 import 'starfield.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -34,14 +37,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     if (state == AppLifecycleState.resumed) ref.read(nowProvider.notifier).tick();
   }
 
-  void _edit([Subscription? s]) {
-    // TODO edit sheet
+  void _edit([Subscription? s]) => showEditSheet(context, existing: s);
+
+  void _showDay(DateTime day, List<Subscription> subs) {
+    final fx = ref.read(fxProvider);
+    final home = ref.read(settingsProvider).homeCurrency;
+    showModalBottomSheet(
+      context: context,
+      builder: (c) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(longDate(day), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              for (final s in subs)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: ServiceIcon(s, size: 44),
+                  title: Text(s.name),
+                  subtitle: Text(s.cadence.label),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(money(s.amount, s.currency),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      if (s.currency != home)
+                        Text('≈ ${money(fx.convert(s.amount, s.currency, home), home)}',
+                            style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.pop(c);
+                    _edit(s);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final subs = ref.watch(subsProvider);
     return Scaffold(
+      floatingActionButton: subs.isEmpty
+          ? null
+          : FloatingActionButton(
+              onPressed: _edit,
+              backgroundColor: AppColors.accent,
+              foregroundColor: Colors.white,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.add_rounded, size: 30),
+            ),
       body: Starfield(
         child: SafeArea(
           bottom: false,
@@ -60,7 +113,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   else ...[
                     ComingUpSection(onEdit: _edit),
                     const SizedBox(height: 28),
-                    PaymentsCalendar(onDayTap: (day, subs) {}),
+                    PaymentsCalendar(onDayTap: _showDay),
                   ],
                 ],
               ),
