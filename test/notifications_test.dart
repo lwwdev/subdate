@@ -39,4 +39,20 @@ void main() {
     final plan = planReminders([sub('Spotify', DateTime(2025, 1, 5), remind: 0)], now, 9);
     expect(reminderText(plan.first), 'Spotify renews today · CA\$7.22');
   });
+
+  test('trial text + paused skipped', () {
+    final t = Subscription(
+      id: 't',
+      name: 'Max',
+      amount: 16.99,
+      currency: 'CAD',
+      cadence: Cadence.monthly,
+      startDate: DateTime(2026, 10, 10),
+      trial: true,
+    );
+    final plan = planReminders([t, sub('p', DateTime(2025, 1, 5)).copyWith(paused: true)], now, 9);
+    expect(plan.every((r) => r.sub.id == 't'), isTrue);
+    expect(reminderText(plan.first), 'Max trial ends tomorrow, cancel or pay CA\$16.99');
+    expect(reminderText(plan[1]), startsWith('Max renews'));
+  });
 }

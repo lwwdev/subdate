@@ -16,7 +16,8 @@ class SpendRow {
 
 List<SpendRow> spendBreakdown(List<Subscription> subs, FxRates fx, String home) {
   final rows = [
-    for (final s in subs) SpendRow(s, fx.convert(monthlyCost(s), s.currency, home)),
+    for (final s in subs)
+      if (!s.paused) SpendRow(s, fx.convert(monthlyCost(s), s.currency, home)),
   ];
   rows.sort((a, b) => b.monthly.compareTo(a.monthly));
   return rows;
