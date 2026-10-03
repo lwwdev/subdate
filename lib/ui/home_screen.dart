@@ -10,6 +10,7 @@ import 'coming_up_section.dart';
 import 'edit_subscription_sheet.dart';
 import 'payments_calendar.dart';
 import 'service_icon.dart';
+import 'settings_sheet.dart';
 import 'starfield.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -111,6 +112,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                       }
                     }, onAdd: _edit)
                   else ...[
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        onPressed: () => showSettingsSheet(context),
+                        icon: const Icon(Icons.tune_rounded, color: AppColors.muted),
+                      ),
+                    ),
                     ComingUpSection(onEdit: _edit),
                     const SizedBox(height: 28),
                     PaymentsCalendar(onDayTap: _showDay),
