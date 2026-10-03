@@ -37,6 +37,8 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
   late int _every;
   late DateTime _date;
   late int _remind;
+  late bool _trial;
+  late bool _paused;
   String? _brandKey;
   Uint8List? _image;
   String? _error;
@@ -56,6 +58,8 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
     // for existing ones show the next renewal, nicer than some date from 2019
     _date = e == null ? dateOnly(DateTime.now()) : nextRenewal(e, DateTime.now());
     _remind = e?.remindDaysBefore ?? settings.defaultRemind;
+    _trial = e?.trial ?? false;
+    _paused = e?.paused ?? false;
     _brandKey = e?.brandKey;
     _image = e?.customImage;
   }
@@ -79,6 +83,8 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
     customImage: _image,
     color: widget.existing?.color ?? Colors.primaries[_name.text.length % Colors.primaries.length].toARGB32(),
     remindDaysBefore: _remind,
+    trial: _trial,
+    paused: _paused,
     notes: widget.existing?.notes ?? '',
   );
 
@@ -149,6 +155,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
             customImage: d.customImage,
             color: d.color,
             remindDaysBefore: d.remindDaysBefore,
+            trial: d.trial,
           )
         : d;
     await ref.read(subsProvider.notifier).save(s);
@@ -274,9 +281,16 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
               ],
             ),
             const SizedBox(height: 4),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Free trial'),
+              subtitle: const Text('first charge is when the trial ends', style: TextStyle(color: AppColors.muted)),
+              value: _trial,
+              onChanged: (v) => setState(() => _trial = v),
+            ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Next payment'),
+              title: Text(_trial ? 'Trial ends' : 'Next payment'),
               subtitle: Text(longDate(_date)),
               trailing: const Icon(Icons.edit_calendar_rounded),
               onTap: _pickDate,
@@ -288,6 +302,14 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
                 decoration: const InputDecoration(labelText: 'Remind me'),
                 items: [for (final e in remindOptions.entries) DropdownMenuItem(value: e.key, child: Text(e.value))],
                 onChanged: (v) => setState(() => _remind = v!),
+              ),
+            if (!_isNew)
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Paused'),
+                subtitle: const Text('hides it everywhere without deleting', style: TextStyle(color: AppColors.muted)),
+                value: _paused,
+                onChanged: (v) => setState(() => _paused = v),
               ),
             if (_error != null) ...[
               const SizedBox(height: 12),
