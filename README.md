@@ -1,17 +1,36 @@
 # subdate
 
-A new Flutter project.
+tracks your subscriptions so you stop getting surprised by charges. flutter, runs on ios / android / web.
 
-## Getting Started
+<img src="docs/screenshot.jpg" width="320" alt="screenshot">
 
-This project is a starting point for a Flutter application.
+## what it does
 
-A few resources to get you started if this is your first Flutter project:
+- "coming up" stack for the next 7 days, total converted to your home currency
+- calendar view of the month with the service icons on renewal days
+- add / edit / delete subs, weekly / monthly / quarterly / yearly (or every N of those)
+- a bunch of built-in brand icons, or use your own image
+- mixed currencies, converted with ECB rates from [frankfurter](https://frankfurter.dev)
+- local reminders before something renews (ios + android)
+- everything stays on your device (hive), no account
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## run it
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+flutter pub get
+flutter run            # pick a device
+flutter run -d chrome  # web
+flutter test
+```
+
+android needs the SDK, ios needs xcode + cocoapods, the usual
+
+## stack
+
+riverpod, hive_ce, flutter_local_notifications, simple_icons, intl
+
+brand icons come from [simple icons](https://simpleicons.org) (CC0), the logos belong to their owners obviously
+
+## license
+
+MIT
