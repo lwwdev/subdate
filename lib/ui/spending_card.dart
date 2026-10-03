@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/providers.dart';
 import '../format.dart';
 import '../logic/spending.dart';
+import '../models/category.dart';
 import '../models/subscription.dart';
 import '../theme.dart';
 import 'service_icon.dart';
@@ -57,6 +58,10 @@ class _SpendingCardState extends ConsumerState<SpendingCard> {
             _yearly ? 'per year, ${rows.length} subs' : 'per month, ${rows.length} subs',
             style: const TextStyle(color: AppColors.muted, fontSize: 13),
           ),
+          if (rows.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            _CategoryBar(byCategory(rows), mult: mult, home: home),
+          ],
           const SizedBox(height: 16),
           for (final r in shown)
             InkWell(
@@ -133,6 +138,68 @@ class _SpendingCardState extends ConsumerState<SpendingCard> {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _CategoryBar extends StatelessWidget {
+  final List<MapEntry<Category, double>> cats;
+  final int mult;
+  final String home;
+  const _CategoryBar(this.cats, {required this.mult, required this.home});
+
+  @override
+  Widget build(BuildContext context) {
+    final total = cats.fold(0.0, (t, e) => t + e.value);
+    if (total <= 0) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Semantics(
+          label: 'spending by category: '
+              '${cats.map((e) => '${e.key.label} ${(e.value / total * 100).round()} percent').join(', ')}',
+          child: ExcludeSemantics(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: SizedBox(
+                height: 10,
+                child: Row(
+                  children: [
+                    for (final (i, e) in cats.indexed)
+                      Flexible(
+                        flex: (e.value / total * 1000).round().clamp(1, 1000),
+                        child: Container(
+                          margin: EdgeInsets.only(left: i == 0 ? 0 : 2),
+                          color: e.key.color,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        ExcludeSemantics(
+          child: Wrap(
+            spacing: 14,
+            runSpacing: 6,
+            children: [
+              for (final e in cats)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(width: 8, height: 8, decoration: BoxDecoration(color: e.key.color, shape: BoxShape.circle)),
+                    const SizedBox(width: 6),
+                    Text(e.key.label, style: const TextStyle(fontSize: 12)),
+                    const SizedBox(width: 4),
+                    Text(money(e.value * mult, home), style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+                  ],
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
