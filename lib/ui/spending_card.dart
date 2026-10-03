@@ -23,11 +23,13 @@ class _SpendingCardState extends ConsumerState<SpendingCard> {
   @override
   Widget build(BuildContext context) {
     final home = ref.watch(settingsProvider).homeCurrency;
-    final rows = spendBreakdown(ref.watch(subsProvider), ref.watch(fxProvider), home);
-    if (rows.isEmpty) return const SizedBox.shrink();
+    final subs = ref.watch(subsProvider);
+    final rows = spendBreakdown(subs, ref.watch(fxProvider), home);
+    final paused = subs.where((s) => s.paused).toList();
+    if (rows.isEmpty && paused.isEmpty) return const SizedBox.shrink();
     final mult = _yearly ? 12 : 1;
     final total = rows.fold(0.0, (t, r) => t + r.monthly) * mult;
-    final top = rows.first.monthly;
+    final top = rows.isEmpty ? 0.0 : rows.first.monthly;
     final shown = _all ? rows : rows.take(5).toList();
 
     return Container(
@@ -104,6 +106,31 @@ class _SpendingCardState extends ConsumerState<SpendingCard> {
               onPressed: () => setState(() => _all = !_all),
               child: Text(_all ? 'show less' : 'show all ${rows.length}'),
             ),
+          if (paused.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            const Text('PAUSED', style: labelStyle),
+            const SizedBox(height: 4),
+            for (final p in paused)
+              InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => widget.onEdit(p),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Opacity(
+                    opacity: 0.5,
+                    child: Row(
+                      children: [
+                        ServiceIcon(p, size: 26),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(p.name, style: const TextStyle(fontSize: 14))),
+                        Text(money(p.amount, p.currency),
+                            style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ],
       ),
     );
