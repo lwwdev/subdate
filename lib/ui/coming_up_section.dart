@@ -78,6 +78,7 @@ class _ComingUpSectionState extends ConsumerState<ComingUpSection> {
                               item: items[i],
                               now: now,
                               expanded: i == open,
+                              last: i == items.length - 1,
                               amountHint: items[i].sub.currency == home
                                   ? null
                                   : '≈ ${money(fx.convert(items[i].sub.amount, items[i].sub.currency, home), home)}',
@@ -126,6 +127,7 @@ class _UpcomingCard extends StatelessWidget {
   final Upcoming item;
   final DateTime now;
   final bool expanded;
+  final bool last;
   final String? amountHint;
   final VoidCallback onTap;
 
@@ -134,6 +136,7 @@ class _UpcomingCard extends StatelessWidget {
     required this.now,
     required this.expanded,
     required this.onTap,
+    this.last = false,
     this.amountHint,
   });
 
@@ -146,7 +149,7 @@ class _UpcomingCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, last ? 18 : 40),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: Color.lerp(AppColors.cardBorder, tint, 0.25)!),
