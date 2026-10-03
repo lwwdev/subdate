@@ -18,6 +18,7 @@ class PaymentsCalendar extends ConsumerStatefulWidget {
 
 class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
   late DateTime _month;
+  int _dir = 1; // which way the grid slides
 
   @override
   void initState() {
@@ -26,7 +27,20 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
     _month = DateTime(now.year, now.month);
   }
 
-  void _shift(int by) => setState(() => _month = DateTime(_month.year, _month.month + by));
+  void _shift(int by) => setState(() {
+        _dir = by.sign;
+        _month = DateTime(_month.year, _month.month + by);
+      });
+
+  void _goToday() {
+    final now = DateTime.now();
+    final m = DateTime(now.year, now.month);
+    if (m == _month) return;
+    setState(() {
+      _dir = m.isAfter(_month) ? 1 : -1;
+      _month = m;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,8 +87,18 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
             Row(
               children: [
                 Expanded(
-                  child: Text(monthTitle(_month),
-                      style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w700)),
+                  child: GestureDetector(
+                    onTap: _goToday,
+                    child: Row(
+                      children: [
+                        Text(monthTitle(_month), style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w700)),
+                        if (_month != DateTime(today.year, today.month)) ...[
+                          const SizedBox(width: 6),
+                          const Icon(Icons.today_rounded, size: 16, color: AppColors.muted),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
                 _NavButton(icon: Icons.chevron_left_rounded, onTap: () => _shift(-1)),
                 const SizedBox(width: 12),
@@ -93,16 +117,43 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
               ],
             ),
             const SizedBox(height: 12),
-            for (var r = 0; r < rows; r++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              alignment: Alignment.topCenter,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 220),
+                transitionBuilder: (child, anim) {
+                  final incoming = child.key == ValueKey(_month);
+                  final dx = (incoming ? 0.15 : -0.15) * _dir;
+                  return FadeTransition(
+                    opacity: anim,
+                    child: SlideTransition(
+                      position: Tween(begin: Offset(dx, 0), end: Offset.zero).animate(anim),
+                      child: child,
+                    ),
+                  );
+                },
+                layoutBuilder: (current, previous) => Stack(
+                  alignment: Alignment.topCenter,
+                  children: [...previous, ?current],
+                ),
+                child: Column(
+                  key: ValueKey(_month),
                   children: [
-                    for (var c = 0; c < 7; c++)
-                      Expanded(child: _cell(r * 7 + c - lead + 1, daysInMonth, payments, today)),
+                    for (var r = 0; r < rows; r++)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            for (var c = 0; c < 7; c++)
+                              Expanded(child: _cell(r * 7 + c - lead + 1, daysInMonth, payments, today)),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
+            ),
           ],
         ),
       ),
