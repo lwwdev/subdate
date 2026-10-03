@@ -11,6 +11,7 @@ import 'edit_subscription_sheet.dart';
 import 'payments_calendar.dart';
 import 'service_icon.dart';
 import 'settings_sheet.dart';
+import 'spending_card.dart';
 import 'starfield.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -140,6 +141,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     ComingUpSection(onEdit: _edit),
                     const SizedBox(height: 28),
                     PaymentsCalendar(onDayTap: _showDay),
+                    const SizedBox(height: 20),
+                    SpendingCard(onEdit: _edit),
                   ],
                 ],
               ),
