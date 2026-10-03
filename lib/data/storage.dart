@@ -7,8 +7,12 @@ class Storage {
   late Box _subs;
   late Box _settings;
 
-  Future<void> init() async {
-    await Hive.initFlutter('subdate');
+  Future<void> init({String? path}) async {
+    if (path != null) {
+      Hive.init(path); // tests
+    } else {
+      await Hive.initFlutter('subdate');
+    }
     _subs = await Hive.openBox('subs');
     _settings = await Hive.openBox('settings');
   }
