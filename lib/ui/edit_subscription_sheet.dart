@@ -68,28 +68,25 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
   }
 
   Subscription get _draft => Subscription(
-        id: widget.existing?.id ?? 'draft',
-        name: _name.text.trim(),
-        amount: double.tryParse(_amount.text.replaceAll(',', '.')) ?? 0,
-        currency: _currency,
-        cadence: _cadence,
-        every: _every,
-        startDate: _startDate(),
-        brandKey: _brandKey,
-        customImage: _image,
-        color: widget.existing?.color ?? Colors.primaries[_name.text.length % Colors.primaries.length].toARGB32(),
-        remindDaysBefore: _remind,
-        notes: widget.existing?.notes ?? '',
-      );
+    id: widget.existing?.id ?? 'draft',
+    name: _name.text.trim(),
+    amount: double.tryParse(_amount.text.replaceAll(',', '.')) ?? 0,
+    currency: _currency,
+    cadence: _cadence,
+    every: _every,
+    startDate: _startDate(),
+    brandKey: _brandKey,
+    customImage: _image,
+    color: widget.existing?.color ?? Colors.primaries[_name.text.length % Colors.primaries.length].toARGB32(),
+    remindDaysBefore: _remind,
+    notes: widget.existing?.notes ?? '',
+  );
 
   // keep the original start date if the user didnt actually move the date,
   // otherwise past months on the calendar would lose their icons
   DateTime _startDate() {
     final e = widget.existing;
-    if (e != null &&
-        e.cadence == _cadence &&
-        e.every == _every &&
-        nextRenewal(e, DateTime.now()) == _date) {
+    if (e != null && e.cadence == _cadence && e.every == _every && nextRenewal(e, DateTime.now()) == _date) {
       return e.startDate;
     }
     return _date;
@@ -120,8 +117,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
       });
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("couldn't load that image")));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("couldn't load that image")));
       }
     }
   }
@@ -188,8 +184,10 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(_isNew ? 'New subscription' : 'Edit subscription',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+            Text(
+              _isNew ? 'New subscription' : 'Edit subscription',
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+            ),
             const SizedBox(height: 20),
             Row(
               children: [
@@ -284,14 +282,13 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
               onTap: _pickDate,
             ),
             const SizedBox(height: 8),
-            DropdownButtonFormField<int>(
-              initialValue: remindOptions.containsKey(_remind) ? _remind : 1,
-              decoration: const InputDecoration(labelText: 'Remind me'),
-              items: [
-                for (final e in remindOptions.entries) DropdownMenuItem(value: e.key, child: Text(e.value)),
-              ],
-              onChanged: (v) => setState(() => _remind = v!),
-            ),
+            if (ref.read(notificationsProvider).supported)
+              DropdownButtonFormField<int>(
+                initialValue: remindOptions.containsKey(_remind) ? _remind : 1,
+                decoration: const InputDecoration(labelText: 'Remind me'),
+                items: [for (final e in remindOptions.entries) DropdownMenuItem(value: e.key, child: Text(e.value))],
+                onChanged: (v) => setState(() => _remind = v!),
+              ),
             if (_error != null) ...[
               const SizedBox(height: 12),
               Text(_error!, style: const TextStyle(color: AppColors.red)),

@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../logic/fx.dart';
 import '../logic/renewals.dart';
 import '../models/subscription.dart';
+import '../services/notifications.dart';
 import 'storage.dart';
 
 final storageProvider = Provider<Storage>((ref) => throw UnimplementedError('override me'));
+final notificationsProvider = Provider<Notifications>((ref) => Notifications());
 
 // bumped when the app resumes so "today" doesnt get stuck overnight
 class NowNotifier extends Notifier<DateTime> {

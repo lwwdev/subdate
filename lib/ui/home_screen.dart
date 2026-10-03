@@ -25,6 +25,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncReminders());
+  }
+
+  void _syncReminders() {
+    ref.read(notificationsProvider).sync(
+          ref.read(subsProvider),
+          ref.read(settingsProvider).notifyHour,
+        );
   }
 
   @override
@@ -35,7 +43,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) ref.read(nowProvider.notifier).tick();
+    if (state == AppLifecycleState.resumed) {
+      ref.read(nowProvider.notifier).tick();
+      _syncReminders(); // tops up the queue since we only schedule ~60 ahead
+    }
   }
 
   void _edit([Subscription? s]) => showEditSheet(context, existing: s);
@@ -86,6 +97,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   @override
   Widget build(BuildContext context) {
     final subs = ref.watch(subsProvider);
+    ref.listen(subsProvider, (_, _) => _syncReminders());
+    ref.listen(settingsProvider.select((s) => s.notifyHour), (_, _) => _syncReminders());
     return Scaffold(
       floatingActionButton: subs.isEmpty
           ? null
