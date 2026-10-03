@@ -72,7 +72,7 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter build web --release --base-href /subdate/
+      - run: flutter build web --release --base-href /subdate/ --no-web-resources-cdn
       - run: cp build/web/index.html build/web/404.html && touch build/web/.nojekyll
       - uses: peaceiris/actions-gh-pages@v4
         with:
