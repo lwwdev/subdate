@@ -39,7 +39,9 @@ List<Subscription> listSubs(
         SubSort.name => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
       };
   out.sort((a, b) {
-    if (a.paused != b.paused) return a.paused ? 1 : -1;
+    // paused and cancelled-and-over sink to the bottom
+    final da = a.paused || nextCharge(a, now) == null, db = b.paused || nextCharge(b, now) == null;
+    if (da != db) return da ? 1 : -1;
     final c = by(a, b);
     return c != 0 ? c : a.name.toLowerCase().compareTo(b.name.toLowerCase());
   });

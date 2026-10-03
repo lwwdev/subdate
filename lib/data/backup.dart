@@ -13,6 +13,7 @@ String exportBackup(List<Subscription> subs) {
         {
           ...s.toMap(),
           'start': s.startDate.toIso8601String().substring(0, 10),
+          'ends': s.endsOn?.toIso8601String().substring(0, 10),
           'img': s.customImage == null ? null : base64Encode(s.customImage!),
         },
     ],
@@ -27,6 +28,7 @@ List<Subscription> importBackup(String text) {
       Subscription.fromMap({
         ...m,
         'start': DateTime.parse(m['start'] as String).millisecondsSinceEpoch,
+        'ends': m['ends'] == null ? null : DateTime.parse(m['ends'] as String).millisecondsSinceEpoch,
         'img': m['img'] == null ? null : Uint8List.fromList(base64Decode(m['img'] as String)),
       }),
   ];

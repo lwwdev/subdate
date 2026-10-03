@@ -36,6 +36,8 @@ class Subscription {
   final String? category; // Category.name, null = guess from brand
   final bool trial; // startDate is when the trial ends / first real charge
   final bool paused;
+  final int people; // split between this many, 1 = just me
+  final DateTime? endsOn; // cancelled, last renewal is on or before this
 
   const Subscription({
     required this.id,
@@ -53,7 +55,15 @@ class Subscription {
     this.trial = false,
     this.paused = false,
     this.category,
+    this.people = 1,
+    this.endsOn,
   });
+
+  /// what you actually pay per charge
+  double get share => amount / people;
+
+  bool endedBy(DateTime now) =>
+      endsOn != null && DateTime(endsOn!.year, endsOn!.month, endsOn!.day).isBefore(DateTime(now.year, now.month, now.day));
 
   bool inTrial(DateTime now) =>
       trial && !DateTime(startDate.year, startDate.month, startDate.day).isBefore(DateTime(now.year, now.month, now.day));
@@ -73,6 +83,9 @@ class Subscription {
     bool? trial,
     bool? paused,
     String? category,
+    int? people,
+    DateTime? endsOn,
+    bool clearEnd = false,
     bool clearImage = false,
     bool clearBrand = false,
   }) {
@@ -92,6 +105,8 @@ class Subscription {
       trial: trial ?? this.trial,
       paused: paused ?? this.paused,
       category: category ?? this.category,
+      people: people ?? this.people,
+      endsOn: clearEnd ? null : (endsOn ?? this.endsOn),
     );
   }
 
@@ -111,6 +126,8 @@ class Subscription {
         'trial': trial,
         'paused': paused,
         'category': category,
+        'people': people,
+        'ends': endsOn?.millisecondsSinceEpoch,
       };
 
   factory Subscription.fromMap(Map m) => Subscription(
@@ -129,5 +146,7 @@ class Subscription {
         trial: (m['trial'] as bool?) ?? false,
         paused: (m['paused'] as bool?) ?? false,
         category: m['category'] as String?,
+        people: (m['people'] as int?) ?? 1,
+        endsOn: m['ends'] == null ? null : DateTime.fromMillisecondsSinceEpoch(m['ends'] as int),
       );
 }
