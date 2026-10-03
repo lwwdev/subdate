@@ -6,6 +6,7 @@ import '../data/sample.dart';
 import '../models/subscription.dart';
 import '../theme.dart';
 import 'coming_up_section.dart';
+import 'payments_calendar.dart';
 import 'starfield.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -56,8 +57,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                         await ref.read(subsProvider.notifier).save(s);
                       }
                     }, onAdd: _edit)
-                  else
+                  else ...[
                     ComingUpSection(onEdit: _edit),
+                    const SizedBox(height: 28),
+                    PaymentsCalendar(onDayTap: (day, subs) {}),
+                  ],
                 ],
               ),
             ),
