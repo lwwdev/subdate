@@ -20,6 +20,16 @@ class ServiceIcon extends StatelessWidget {
       child = Image.memory(sub.customImage!, fit: BoxFit.cover, width: size, height: size);
     } else if (brand?.icon != null) {
       child = Icon(brand!.icon, size: size * 0.58, color: brand.fg);
+    } else if (brand?.mark != null) {
+      child = Padding(
+        padding: EdgeInsets.all(size * 0.16),
+        child: FittedBox(
+          child: Text(
+            brand!.mark!,
+            style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5, color: brand.fg),
+          ),
+        ),
+      );
     } else {
       child = Text(
         sub.name.isEmpty ? '?' : sub.name.characters.first.toUpperCase(),
@@ -51,7 +61,13 @@ class ServiceIcon extends StatelessWidget {
 Color tintFor(Subscription s) {
   final b = brandFor(s.brandKey);
   if (b == null) return Color(s.color ?? 0xFF5B5FD0);
-  // white/black tiles look bad as a tint so use the glyph color
-  final lum = b.bg.computeLuminance();
-  return (lum > 0.8 || lum < 0.02) ? b.fg : b.bg;
+  // white/black tiles look bad as a tint so use the glyph color,
+  // and if thats black/white too (playstation) fall back to the category
+  bool flat(Color c) {
+    final l = c.computeLuminance();
+    return l > 0.8 || l < 0.02;
+  }
+  if (!flat(b.bg)) return b.bg;
+  if (!flat(b.fg)) return b.fg;
+  return b.category.color;
 }
