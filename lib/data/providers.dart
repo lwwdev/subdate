@@ -43,13 +43,15 @@ class Settings {
   final String homeCurrency;
   final int defaultRemind;
   final int notifyHour;
+  final int upcomingDays;
 
-  const Settings({this.homeCurrency = 'CAD', this.defaultRemind = 1, this.notifyHour = 9});
+  const Settings({this.homeCurrency = 'CAD', this.defaultRemind = 1, this.notifyHour = 9, this.upcomingDays = 7});
 
-  Settings copyWith({String? homeCurrency, int? defaultRemind, int? notifyHour}) => Settings(
+  Settings copyWith({String? homeCurrency, int? defaultRemind, int? notifyHour, int? upcomingDays}) => Settings(
         homeCurrency: homeCurrency ?? this.homeCurrency,
         defaultRemind: defaultRemind ?? this.defaultRemind,
         notifyHour: notifyHour ?? this.notifyHour,
+        upcomingDays: upcomingDays ?? this.upcomingDays,
       );
 }
 
@@ -61,6 +63,7 @@ class SettingsNotifier extends Notifier<Settings> {
       homeCurrency: st.get<String>('home') ?? 'CAD',
       defaultRemind: st.get<int>('remind') ?? 1,
       notifyHour: st.get<int>('hour') ?? 9,
+      upcomingDays: st.get<int>('days') ?? 7,
     );
   }
 
@@ -69,6 +72,7 @@ class SettingsNotifier extends Notifier<Settings> {
     await st.set('home', s.homeCurrency);
     await st.set('remind', s.defaultRemind);
     await st.set('hour', s.notifyHour);
+    await st.set('days', s.upcomingDays);
     state = s;
   }
 }
@@ -102,7 +106,8 @@ class Upcoming {
 
 final upcomingProvider = Provider<List<Upcoming>>((ref) {
   final now = dateOnly(ref.watch(nowProvider));
-  final end = now.add(const Duration(days: 6));
+  final days = ref.watch(settingsProvider.select((s) => s.upcomingDays));
+  final end = DateTime(now.year, now.month, now.day + days - 1);
   final out = <Upcoming>[
     for (final s in ref.watch(subsProvider))
       if (!s.paused)
