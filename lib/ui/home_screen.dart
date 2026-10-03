@@ -6,6 +6,7 @@ import '../data/sample.dart';
 import '../format.dart';
 import '../models/subscription.dart';
 import '../theme.dart';
+import 'all_subs_sheet.dart';
 import 'coming_up_section.dart';
 import 'edit_subscription_sheet.dart';
 import 'payments_calendar.dart';
@@ -121,6 +122,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 const Text('subdate',
                     style: TextStyle(color: AppColors.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
                 const Spacer(),
+                if (subs.isNotEmpty)
+                  IconButton(
+                    onPressed: () => showAllSubsSheet(context, onEdit: _edit),
+                    tooltip: 'All subscriptions',
+                    icon: const Icon(Icons.format_list_bulleted_rounded, color: AppColors.muted, size: 20),
+                  ),
                 IconButton(
                   onPressed: () => showSettingsSheet(context),
                   tooltip: 'Settings',
