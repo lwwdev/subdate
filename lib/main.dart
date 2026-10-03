@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'data/providers.dart';
+import 'data/storage.dart';
 import 'theme.dart';
+import 'ui/home_screen.dart';
 
-void main() {
-  runApp(const ProviderScope(child: SubdateApp()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final storage = Storage();
+  await storage.init();
+  runApp(ProviderScope(
+    overrides: [storageProvider.overrideWithValue(storage)],
+    child: const SubdateApp(),
+  ));
 }
 
 class SubdateApp extends StatelessWidget {
@@ -16,7 +25,7 @@ class SubdateApp extends StatelessWidget {
       title: 'subdate',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
-      home: const Scaffold(body: Center(child: Text('soon'))),
+      home: const HomeScreen(),
     );
   }
 }
