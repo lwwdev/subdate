@@ -8,6 +8,7 @@ import '../brand/brand_catalog.dart';
 import '../data/providers.dart';
 import '../format.dart';
 import '../logic/renewals.dart';
+import '../models/category.dart';
 import '../models/subscription.dart';
 import '../theme.dart';
 import 'brand_picker.dart';
@@ -42,6 +43,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
   late bool _trial;
   late bool _paused;
   String? _brandKey;
+  String? _category;
   Uint8List? _image;
   String? _error;
 
@@ -64,6 +66,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
     _trial = e?.trial ?? false;
     _paused = e?.paused ?? false;
     _brandKey = e?.brandKey;
+    _category = e?.category;
     _image = e?.customImage;
   }
 
@@ -90,6 +93,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
     trial: _trial,
     paused: _paused,
     notes: _notes.text.trim(),
+    category: _category,
   );
 
   // keep the original start date if the user didnt actually move the date,
@@ -161,6 +165,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
             remindDaysBefore: d.remindDaysBefore,
             trial: d.trial,
             notes: d.notes,
+            category: d.category,
           )
         : d;
     await ref.read(subsProvider.notifier).save(s);
@@ -284,6 +289,25 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
                 ),
                 Text(_unit(), style: const TextStyle(color: AppColors.muted)),
               ],
+            ),
+            const SizedBox(height: 12),
+            // only stored once the user picks one, otherwise it follows the brand
+            DropdownButtonFormField<Category>(
+              key: ValueKey(categoryOf(_draft)),
+              initialValue: categoryOf(_draft),
+              decoration: const InputDecoration(labelText: 'Category'),
+              items: [
+                for (final c in Category.values)
+                  DropdownMenuItem(
+                    value: c,
+                    child: Row(children: [
+                      Container(width: 10, height: 10, decoration: BoxDecoration(color: c.color, shape: BoxShape.circle)),
+                      const SizedBox(width: 10),
+                      Text(c.label),
+                    ]),
+                  ),
+              ],
+              onChanged: (v) => setState(() => _category = v!.name),
             ),
             const SizedBox(height: 4),
             SwitchListTile(
