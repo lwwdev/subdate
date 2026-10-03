@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/providers.dart';
 import '../format.dart';
+import '../logic/fx.dart';
 import '../logic/renewals.dart';
 import '../models/subscription.dart';
 import '../theme.dart';
@@ -77,9 +78,7 @@ class _ComingUpSectionState extends ConsumerState<ComingUpSection> {
                           now: now,
                           expanded: i == open,
                           last: i == items.length - 1,
-                          amountHint: items[i].sub.currency == home
-                              ? null
-                              : '≈ ${money(fx.convert(items[i].sub.amount, items[i].sub.currency, home), home)}',
+                          amountHint: _hint(items[i].sub, fx, home),
                           onTap: () => i == open ? widget.onEdit(items[i].sub) : setState(() => _open = i),
                         ),
                       ),
@@ -326,4 +325,10 @@ class _RenderOverlap extends RenderProxyBox {
     c.layout(constraints.loosen().copyWith(minWidth: constraints.minWidth), parentUsesSize: true);
     size = constraints.constrain(Size(c.size.width, max(0, c.size.height - _overlap)));
   }
+}
+
+String? _hint(Subscription s, FxRates fx, String home) {
+  if (s.people > 1) return 'your share ${money(fx.convert(s.share, s.currency, home), home)}';
+  if (s.currency == home) return null;
+  return '≈ ${money(fx.convert(s.amount, s.currency, home), home)}';
 }

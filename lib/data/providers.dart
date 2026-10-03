@@ -154,7 +154,7 @@ final upcomingProvider = Provider<List<Upcoming>>((ref) {
 final upcomingTotalProvider = Provider<double>((ref) {
   final fx = ref.watch(fxProvider);
   final home = ref.watch(settingsProvider).homeCurrency;
-  return ref.watch(upcomingProvider).fold(0.0, (t, u) => t + fx.convert(u.sub.amount, u.sub.currency, home));
+  return ref.watch(upcomingProvider).fold(0.0, (t, u) => t + fx.convert(u.sub.share, u.sub.currency, home));
 });
 
 // day of month -> subs renewing that day

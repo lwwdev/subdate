@@ -42,6 +42,8 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
   late int _remind;
   late bool _trial;
   late bool _paused;
+  late int _people;
+  DateTime? _endsOn;
   String? _brandKey;
   String? _category;
   Uint8List? _image;
@@ -65,6 +67,8 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
     _remind = e?.remindDaysBefore ?? settings.defaultRemind;
     _trial = e?.trial ?? false;
     _paused = e?.paused ?? false;
+    _people = e?.people ?? 1;
+    _endsOn = e?.endsOn;
     _brandKey = e?.brandKey;
     _category = e?.category;
     _image = e?.customImage;
@@ -94,6 +98,8 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
     paused: _paused,
     notes: _notes.text.trim(),
     category: _category,
+    people: _people,
+    endsOn: _endsOn,
   );
 
   // keep the original start date if the user didnt actually move the date,
@@ -166,6 +172,8 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
             trial: d.trial,
             notes: d.notes,
             category: d.category,
+            people: d.people,
+            endsOn: d.endsOn,
           )
         : d;
     await ref.read(subsProvider.notifier).save(s);
@@ -186,9 +194,16 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
         ],
       ),
     );
-    if (ok != true) return;
-    await ref.read(subsProvider.notifier).remove(widget.existing!.id);
+    if (ok != true || !mounted) return;
+    final gone = widget.existing!;
+    final subs = ref.read(subsProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+    await subs.remove(gone.id);
     if (mounted) Navigator.pop(context);
+    messenger.showSnackBar(SnackBar(
+      content: Text('${gone.name} deleted'),
+      action: SnackBarAction(label: 'Undo', onPressed: () => subs.save(gone)),
+    ));
   }
 
   @override
@@ -290,6 +305,29 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
                 Text(_unit(), style: const TextStyle(color: AppColors.muted)),
               ],
             ),
+            Row(
+              children: [
+                const Text('Split between', style: TextStyle(color: AppColors.muted)),
+                IconButton(
+                  tooltip: 'Fewer people',
+                  onPressed: _people > 1 ? () => setState(() => _people--) : null,
+                  icon: const Icon(Icons.remove_circle_outline),
+                ),
+                Text('$_people', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                IconButton(
+                  tooltip: 'More people',
+                  onPressed: _people < 20 ? () => setState(() => _people++) : null,
+                  icon: const Icon(Icons.add_circle_outline),
+                ),
+                Expanded(
+                  child: Text(
+                    _people == 1 ? 'just me' : 'you pay ${money(_draft.share, _currency)}',
+                    style: const TextStyle(color: AppColors.muted),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
             // only stored once the user picks one, otherwise it follows the brand
             DropdownButtonFormField<Category>(
@@ -346,6 +384,30 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
                 subtitle: const Text('hides it everywhere without deleting', style: TextStyle(color: AppColors.muted)),
                 value: _paused,
                 onChanged: (v) => setState(() => _paused = v),
+              ),
+            if (!_isNew)
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Cancelled'),
+                subtitle: const Text('still runs until the date below, then stops', style: TextStyle(color: AppColors.muted)),
+                value: _endsOn != null,
+                onChanged: (v) => setState(() => _endsOn = v ? _date : null),
+              ),
+            if (!_isNew && _endsOn != null)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Runs until'),
+                subtitle: Text(longDate(_endsOn!)),
+                trailing: const Icon(Icons.event_busy_rounded),
+                onTap: () async {
+                  final d = await showDatePicker(
+                    context: context,
+                    initialDate: _endsOn!,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (d != null) setState(() => _endsOn = d);
+                },
               ),
             if (_error != null) ...[
               const SizedBox(height: 12),
