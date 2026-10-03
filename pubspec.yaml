@@ -44,7 +44,7 @@ dependencies:
   http: ^1.6.0
   simple_icons: ^16.23.0
   image_picker: ^1.2.3
-  google_fonts: ^9.0.0
+  google_fonts: ^8.0.0
   uuid: ^4.6.0
 
 dev_dependencies:
