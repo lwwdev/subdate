@@ -22,3 +22,60 @@ jobs:
       - run: flutter analyze
       - run: flutter test test/
       - run: flutter build web
+
+  # no signing, just makes sure it still compiles on xcode
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+      - run: cd build/ios/iphoneos && mkdir Payload && cp -r Runner.app Payload/ && zip -qr subdate-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: subdate-ios-unsigned
+          path: build/ios/iphoneos/subdate-unsigned.ipa
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: subdate-android
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  pages:
+    if: github.event_name == 'push'
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build web --release --base-href /subdate/
+      - run: cp build/web/index.html build/web/404.html && touch build/web/.nojekyll
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
+          force_orphan: true
