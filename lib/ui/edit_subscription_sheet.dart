@@ -21,8 +21,6 @@ Future<void> showEditSheet(BuildContext context, {Subscription? existing}) {
   );
 }
 
-const _remindOptions = {-1: 'Off', 0: 'Same day', 1: '1 day before', 2: '2 days before', 3: '3 days before', 7: '1 week before'};
-
 class EditSubscriptionSheet extends ConsumerStatefulWidget {
   final Subscription? existing;
   const EditSubscriptionSheet({super.key, this.existing});
@@ -287,10 +285,10 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<int>(
-              initialValue: _remindOptions.containsKey(_remind) ? _remind : 1,
+              initialValue: remindOptions.containsKey(_remind) ? _remind : 1,
               decoration: const InputDecoration(labelText: 'Remind me'),
               items: [
-                for (final e in _remindOptions.entries) DropdownMenuItem(value: e.key, child: Text(e.value)),
+                for (final e in remindOptions.entries) DropdownMenuItem(value: e.key, child: Text(e.value)),
               ],
               onChanged: (v) => setState(() => _remind = v!),
             ),
