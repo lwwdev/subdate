@@ -38,24 +38,28 @@ class _ComingUpSectionState extends ConsumerState<ComingUpSection> {
         Row(
           children: [
             const Text('Coming up',
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
-            const SizedBox(width: 10),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
+            const SizedBox(width: 8),
             _ChevronButton(
               collapsed: _collapsed,
               onTap: () => setState(() => _collapsed = !_collapsed),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                'Next 7 days, ${money(total, home)}',
-                textAlign: TextAlign.right,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: AppColors.muted, fontSize: 15),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'Next 7 days, ${money(total, home)}',
+                    style: const TextStyle(color: AppColors.muted, fontSize: 14),
+                  ),
+                ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 14),
         AnimatedSize(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOutCubic,
@@ -69,7 +73,7 @@ class _ComingUpSectionState extends ConsumerState<ComingUpSection> {
                       children: [
                         for (var i = 0; i < items.length; i++)
                           _Overlap(
-                            overlap: i == items.length - 1 ? 0 : 30,
+                            overlap: i == items.length - 1 ? 0 : 24,
                             child: _UpcomingCard(
                               item: items[i],
                               now: now,
@@ -101,8 +105,8 @@ class _ChevronButton extends StatelessWidget {
       onTap: onTap,
       radius: 24,
       child: Container(
-        width: 40,
-        height: 40,
+        width: 32,
+        height: 32,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: AppColors.card.withValues(alpha: 0.6),
@@ -111,7 +115,7 @@ class _ChevronButton extends StatelessWidget {
         child: AnimatedRotation(
           turns: collapsed ? -0.25 : 0,
           duration: const Duration(milliseconds: 200),
-          child: const Icon(Icons.keyboard_arrow_down_rounded, size: 24),
+          child: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
         ),
       ),
     );
@@ -142,9 +146,9 @@ class _UpcomingCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(22, 20, 22, 50),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(34),
+          borderRadius: BorderRadius.circular(28),
           border: Border.all(color: Color.lerp(AppColors.cardBorder, tint, 0.25)!),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -163,22 +167,22 @@ class _UpcomingCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                ServiceIcon(s, size: 52),
-                const SizedBox(width: 18),
+                ServiceIcon(s, size: 38),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Text(s.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w500)),
+                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
                   decoration: BoxDecoration(
                     color: AppColors.pill,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(dayPill(item.date),
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
@@ -189,7 +193,7 @@ class _UpcomingCard extends StatelessWidget {
               child: !expanded
                   ? const SizedBox(width: double.infinity)
                   : Padding(
-                      padding: const EdgeInsets.only(top: 28),
+                      padding: const EdgeInsets.only(top: 20),
                       child: Column(
                         children: [
                           Row(children: [
@@ -204,7 +208,7 @@ class _UpcomingCard extends StatelessWidget {
                               hint: amountHint,
                             ),
                           ]),
-                          const SizedBox(height: 22),
+                          const SizedBox(height: 16),
                           Row(children: [
                             _Field(
                               label: 'CADENCE',
@@ -240,13 +244,13 @@ class _Field extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label, style: labelStyle),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(value,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 23, fontWeight: FontWeight.w500, color: color)),
+              style: TextStyle(fontSize: 19, fontWeight: FontWeight.w500, color: color)),
           if (hint != null)
-            Text(hint!, style: const TextStyle(color: AppColors.muted, fontSize: 13)),
+            Text(hint!, style: const TextStyle(color: AppColors.muted, fontSize: 12)),
         ],
       ),
     );
@@ -259,10 +263,10 @@ class _Empty extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: AppColors.card.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(34),
+        borderRadius: BorderRadius.circular(28),
         border: Border.all(color: AppColors.cardBorder),
       ),
       child: const Text('nothing due this week 🎉',
