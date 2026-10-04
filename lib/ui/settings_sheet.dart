@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../data/backup.dart';
+import '../data/csv.dart';
 import '../data/providers.dart';
 import '../models/subscription.dart';
 import '../theme.dart';
@@ -34,6 +35,14 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
     final m = ScaffoldMessenger.of(context);
     Navigator.pop(context);
     m.showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  Future<void> _copyCsv() async {
+    final home = ref.read(settingsProvider).homeCurrency;
+    await Clipboard.setData(ClipboardData(
+      text: exportCsv(ref.read(subsProvider), ref.read(fxProvider), home, DateTime.now()),
+    ));
+    _toast('copied, paste it into a spreadsheet');
   }
 
   Future<void> _copyBackup() async {
@@ -169,6 +178,13 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
             subtitle: const Text('everything as json, paste it somewhere safe',
                 style: TextStyle(color: AppColors.muted)),
             onTap: _copyBackup,
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.table_chart_outlined),
+            title: const Text('Copy as CSV'),
+            subtitle: const Text('for a spreadsheet, not a backup', style: TextStyle(color: AppColors.muted)),
+            onTap: _copyCsv,
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
