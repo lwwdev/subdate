@@ -67,7 +67,7 @@ class Settings {
   final int weekStart; // DateTime.monday or DateTime.sunday
 
   const Settings({
-    this.homeCurrency = 'CAD',
+    this.homeCurrency = 'SEK',
     this.defaultRemind = 1,
     this.notifyHour = 9,
     this.upcomingDays = 7,
@@ -89,7 +89,7 @@ class SettingsNotifier extends Notifier<Settings> {
   Settings build() {
     final st = ref.read(storageProvider);
     return Settings(
-      homeCurrency: st.get<String>('home') ?? 'CAD',
+      homeCurrency: st.get<String>('home') ?? 'SEK',
       defaultRemind: st.get<int>('remind') ?? 1,
       notifyHour: st.get<int>('hour') ?? 9,
       upcomingDays: st.get<int>('days') ?? 7,

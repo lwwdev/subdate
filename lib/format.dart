@@ -16,6 +16,8 @@ const _dollars = {
 
 String money(double v, String currency) {
   final f = _money.putIfAbsent(currency, () {
+    // swedish style, 129,00 kr
+    if (currency == 'SEK') return NumberFormat.currency(name: 'SEK', symbol: 'kr', locale: 'sv', decimalDigits: 2);
     final sym = _dollars[currency];
     return sym == null
         ? NumberFormat.simpleCurrency(name: currency, locale: 'en')
