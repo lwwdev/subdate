@@ -35,6 +35,20 @@ no mac? every push to main builds an apk and an unsigned ios build in CI, grab t
 run's artifacts on the actions tab. the unsigned .ipa needs re-signing (sideloadly, altstore etc) before it installs.
 the web build gets deployed to github pages from the same run.
 
+## ios / testflight
+
+the `testflight` workflow builds, signs and uploads to app store connect without a mac. one-time setup:
+
+1. join the apple developer program and create the app in app store connect with bundle id `dev.lwwdev.subdate`
+2. app store connect > users and access > integrations > team keys: make a key with the **admin** role
+   (needed so xcode can create the certs/profiles itself), download the .p8
+3. add repo secrets (settings > secrets and variables > actions):
+   - `APPSTORE_KEY_ID` - the key id
+   - `APPSTORE_ISSUER_ID` - issuer id shown above the keys list
+   - `APPSTORE_KEY_P8` - the whole contents of the .p8 file
+   - `APPLE_TEAM_ID` - from developer.apple.com > membership
+4. actions tab > testflight > run workflow. the build shows up in testflight ~15 min later
+
 ## stack
 
 riverpod, hive_ce, flutter_local_notifications, simple_icons, intl
