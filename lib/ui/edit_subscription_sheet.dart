@@ -17,6 +17,7 @@ Future<void> showEditSheet(BuildContext context, {Subscription? existing}) {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     builder: (_) => EditSubscriptionSheet(existing: existing),
   );
 }
