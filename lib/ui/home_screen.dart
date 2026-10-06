@@ -114,30 +114,73 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       body: Starfield(
         child: SafeArea(
           bottom: false,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560),
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
-                children: [
-                  if (subs.isEmpty)
-                    _FirstRun(onSample: () async {
-                      for (final s in sampleSubs(DateTime.now())) {
-                        await ref.read(subsProvider.notifier).save(s);
-                      }
-                    }, onAdd: _edit)
-                  else ...[
-                    Row(
-                      children: [
-                        const Text('subdate',
-                            style: TextStyle(color: AppColors.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
-                        const Spacer(),
-                        IconButton(
-                          onPressed: () => showSettingsSheet(context),
-                          icon: const Icon(Icons.tune_rounded, color: AppColors.muted, size: 20),
+          child: LayoutBuilder(builder: (context, c) {
+            final header = Row(
+              children: [
+                const Text('subdate',
+                    style: TextStyle(color: AppColors.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => showSettingsSheet(context),
+                  icon: const Icon(Icons.tune_rounded, color: AppColors.muted, size: 20),
+                ),
+              ],
+            );
+            if (subs.isEmpty) {
+              return Center(
+                child: _FirstRun(
+                  onSample: () async {
+                    for (final s in sampleSubs(DateTime.now())) {
+                      await ref.read(subsProvider.notifier).save(s);
+                    }
+                  },
+                  onAdd: _edit,
+                ),
+              );
+            }
+            // side by side on desktop-ish widths
+            if (c.maxWidth >= 1000) {
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1120),
+                  child: Column(
+                    children: [
+                      Padding(padding: const EdgeInsets.fromLTRB(24, 4, 24, 0), child: header),
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: ListView(
+                                padding: const EdgeInsets.fromLTRB(24, 4, 12, 120),
+                                children: [
+                                  ComingUpSection(onEdit: _edit),
+                                  const SizedBox(height: 20),
+                                  SpendingCard(onEdit: _edit),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: ListView(
+                                padding: const EdgeInsets.fromLTRB(12, 56, 24, 120),
+                                children: [PaymentsCalendar(onDayTap: _showDay)],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
+                  children: [
+                    header,
                     const SizedBox(height: 4),
                     ComingUpSection(onEdit: _edit),
                     const SizedBox(height: 28),
@@ -145,10 +188,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     const SizedBox(height: 20),
                     SpendingCard(onEdit: _edit),
                   ],
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          }),
         ),
       ),
     );
@@ -163,8 +206,9 @@ class _FirstRun extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 80),
+      padding: const EdgeInsets.all(24),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Text('no subs yet', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
