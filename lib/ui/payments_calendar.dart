@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/providers.dart';
@@ -28,6 +29,7 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
   }
 
   void _shift(int by) => setState(() {
+        HapticFeedback.selectionClick();
         _dir = by.sign;
         _month = DateTime(_month.year, _month.month + by);
       });
