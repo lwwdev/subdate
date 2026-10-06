@@ -64,14 +64,23 @@ class Settings {
   final int defaultRemind;
   final int notifyHour;
   final int upcomingDays;
+  final int weekStart; // DateTime.monday or DateTime.sunday
 
-  const Settings({this.homeCurrency = 'CAD', this.defaultRemind = 1, this.notifyHour = 9, this.upcomingDays = 7});
+  const Settings({
+    this.homeCurrency = 'CAD',
+    this.defaultRemind = 1,
+    this.notifyHour = 9,
+    this.upcomingDays = 7,
+    this.weekStart = DateTime.monday,
+  });
 
-  Settings copyWith({String? homeCurrency, int? defaultRemind, int? notifyHour, int? upcomingDays}) => Settings(
+  Settings copyWith({String? homeCurrency, int? defaultRemind, int? notifyHour, int? upcomingDays, int? weekStart}) =>
+      Settings(
         homeCurrency: homeCurrency ?? this.homeCurrency,
         defaultRemind: defaultRemind ?? this.defaultRemind,
         notifyHour: notifyHour ?? this.notifyHour,
         upcomingDays: upcomingDays ?? this.upcomingDays,
+        weekStart: weekStart ?? this.weekStart,
       );
 }
 
@@ -84,6 +93,7 @@ class SettingsNotifier extends Notifier<Settings> {
       defaultRemind: st.get<int>('remind') ?? 1,
       notifyHour: st.get<int>('hour') ?? 9,
       upcomingDays: st.get<int>('days') ?? 7,
+      weekStart: st.get<int>('week') ?? DateTime.monday,
     );
   }
 
@@ -93,6 +103,7 @@ class SettingsNotifier extends Notifier<Settings> {
     await st.set('remind', s.defaultRemind);
     await st.set('hour', s.notifyHour);
     await st.set('days', s.upcomingDays);
+    await st.set('week', s.weekStart);
     state = s;
   }
 }
@@ -143,9 +154,7 @@ final upcomingProvider = Provider<List<Upcoming>>((ref) {
 final upcomingTotalProvider = Provider<double>((ref) {
   final fx = ref.watch(fxProvider);
   final home = ref.watch(settingsProvider).homeCurrency;
-  return ref
-      .watch(upcomingProvider)
-      .fold(0.0, (t, u) => t + fx.convert(u.sub.amount, u.sub.currency, home));
+  return ref.watch(upcomingProvider).fold(0.0, (t, u) => t + fx.convert(u.sub.amount, u.sub.currency, home));
 });
 
 // day of month -> subs renewing that day

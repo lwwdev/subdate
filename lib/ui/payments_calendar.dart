@@ -55,7 +55,10 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
         .fold(0.0, (t, s) => t + fx.convert(s.amount, s.currency, home));
 
     final daysInMonth = DateTime(_month.year, _month.month + 1, 0).day;
-    final lead = DateTime(_month.year, _month.month, 1).weekday - 1; // monday first
+    final weekStart = ref.watch(settingsProvider.select((s) => s.weekStart));
+    final lead = leadingBlanks(_month, weekStart);
+    const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    final dayNames = [for (var i = 0; i < 7; i++) names[(weekStart - 1 + i) % 7]];
     final cells = lead + daysInMonth;
     final rows = (cells / 7).ceil();
 
@@ -110,7 +113,7 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
             const SizedBox(height: 14),
             Row(
               children: [
-                for (final d in const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+                for (final d in dayNames)
                   Expanded(
                     child: Text(d,
                         textAlign: TextAlign.center,

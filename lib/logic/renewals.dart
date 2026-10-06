@@ -69,3 +69,7 @@ String relativeLabel(DateTime d, DateTime now) {
   if (diff < 0) return '${-diff} days ago';
   return 'in $diff days';
 }
+
+// empty cells before the 1st in a calendar grid
+int leadingBlanks(DateTime month, int weekStart) =>
+    (DateTime(month.year, month.month, 1).weekday - weekStart + 7) % 7;
