@@ -71,7 +71,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   contentPadding: EdgeInsets.zero,
                   leading: ServiceIcon(s, size: 44),
                   title: Text(s.name),
-                  subtitle: Text(s.cadence.label),
+                  subtitle: Text(s.notes.isEmpty ? s.cadence.label : '${s.cadence.label} · ${s.notes}',
+                      maxLines: 2, overflow: TextOverflow.ellipsis),
                   trailing: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,

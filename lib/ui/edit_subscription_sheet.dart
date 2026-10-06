@@ -32,6 +32,7 @@ class EditSubscriptionSheet extends ConsumerStatefulWidget {
 class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
   late final TextEditingController _name;
   late final TextEditingController _amount;
+  late final TextEditingController _notes;
   late String _currency;
   late Cadence _cadence;
   late int _every;
@@ -52,6 +53,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
     final settings = ref.read(settingsProvider);
     _name = TextEditingController(text: e?.name ?? '');
     _amount = TextEditingController(text: e == null ? '' : e.amount.toStringAsFixed(2));
+    _notes = TextEditingController(text: e?.notes ?? '');
     _currency = e?.currency ?? settings.homeCurrency;
     _cadence = e?.cadence ?? Cadence.monthly;
     _every = e?.every ?? 1;
@@ -68,6 +70,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
   void dispose() {
     _name.dispose();
     _amount.dispose();
+    _notes.dispose();
     super.dispose();
   }
 
@@ -85,7 +88,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
     remindDaysBefore: _remind,
     trial: _trial,
     paused: _paused,
-    notes: widget.existing?.notes ?? '',
+    notes: _notes.text.trim(),
   );
 
   // keep the original start date if the user didnt actually move the date,
@@ -156,6 +159,7 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
             color: d.color,
             remindDaysBefore: d.remindDaysBefore,
             trial: d.trial,
+            notes: d.notes,
           )
         : d;
     await ref.read(subsProvider.notifier).save(s);
@@ -303,6 +307,13 @@ class _EditSubscriptionSheetState extends ConsumerState<EditSubscriptionSheet> {
                 items: [for (final e in remindOptions.entries) DropdownMenuItem(value: e.key, child: Text(e.value))],
                 onChanged: (v) => setState(() => _remind = v!),
               ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _notes,
+              maxLines: 2,
+              minLines: 1,
+              decoration: const InputDecoration(labelText: 'Notes', hintText: 'which card, family plan, etc'),
+            ),
             if (!_isNew)
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
