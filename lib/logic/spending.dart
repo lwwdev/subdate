@@ -1,3 +1,5 @@
+import '../brand/brand_catalog.dart';
+import '../models/category.dart';
 import '../models/subscription.dart';
 import 'fx.dart';
 
@@ -21,4 +23,14 @@ List<SpendRow> spendBreakdown(List<Subscription> subs, FxRates fx, String home) 
   ];
   rows.sort((a, b) => b.monthly.compareTo(a.monthly));
   return rows;
+}
+
+/// monthly totals per category, biggest first
+List<MapEntry<Category, double>> byCategory(List<SpendRow> rows) {
+  final m = <Category, double>{};
+  for (final r in rows) {
+    final c = categoryOf(r.sub);
+    m[c] = (m[c] ?? 0) + r.monthly;
+  }
+  return m.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 }
