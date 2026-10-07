@@ -13,6 +13,7 @@ class Brand {
   final double? price; // rough default, CAD-ish
   final String currency;
   final Category category;
+  final String? mark; // text logo for brands with no icon
 
   const Brand(
     this.key,
@@ -23,10 +24,11 @@ class Brand {
     this.price,
     this.currency = 'CAD',
     this.category = Category.other,
+    this.mark,
   });
 }
 
-// simple_icons doesnt have openai/disney/prime anymore so those get a generic glyph
+// simple_icons dropped openai/disney/prime/xbox so those get a text mark instead
 const brands = <Brand>[
   Brand(
     'spotify',
@@ -49,9 +51,10 @@ const brands = <Brand>[
   Brand(
     'chatgpt',
     'ChatGPT',
-    Icons.blur_on_rounded,
+    null,
     Color(0xFFF4F4F4),
     fg: Colors.black,
+    mark: 'GPT',
     price: 20,
     currency: 'USD',
     category: Category.ai,
@@ -93,8 +96,8 @@ const brands = <Brand>[
   ),
   Brand('appletv', 'Apple TV+', SimpleIcons.appletv, Colors.black, price: 12.99, category: Category.video),
   Brand('icloud', 'iCloud+', SimpleIcons.icloud, SimpleIconColors.icloud, price: 1.29, category: Category.cloud),
-  Brand('disney', 'Disney+', Icons.castle_rounded, Color(0xFF0E1C5A), price: 11.99, category: Category.video),
-  Brand('prime', 'Prime Video', Icons.play_arrow_rounded, Color(0xFF1A98FF), price: 9.99, category: Category.video),
+  Brand('disney', 'Disney+', null, Color(0xFF0E1C5A), price: 11.99, category: Category.video, mark: 'D+'),
+  Brand('prime', 'Prime Video', null, Color(0xFF00A8E1), price: 9.99, category: Category.video, mark: 'prime'),
   Brand('max', 'Max', SimpleIcons.max, Color(0xFF002BE7), price: 16.99, category: Category.video),
   Brand(
     'crunchyroll',
@@ -115,8 +118,9 @@ const brands = <Brand>[
   Brand(
     'xbox',
     'Xbox Game Pass',
-    Icons.sports_esports_rounded,
+    null,
     Color(0xFF107C10),
+    mark: 'GP',
     price: 19.99,
     category: Category.gaming,
   ),
