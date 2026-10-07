@@ -98,21 +98,25 @@ class _ChevronButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkResponse(
-      onTap: onTap,
-      radius: 24,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppColors.card.withValues(alpha: 0.6),
-          border: Border.all(color: AppColors.cardBorder),
-        ),
-        child: AnimatedRotation(
-          turns: collapsed ? -0.25 : 0,
-          duration: const Duration(milliseconds: 200),
-          child: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
+    return Semantics(
+      button: true,
+      label: collapsed ? 'show upcoming' : 'hide upcoming',
+      child: InkResponse(
+        onTap: onTap,
+        radius: 24,
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.card.withValues(alpha: 0.6),
+            border: Border.all(color: AppColors.cardBorder),
+          ),
+          child: AnimatedRotation(
+            turns: collapsed ? -0.25 : 0,
+            duration: const Duration(milliseconds: 200),
+            child: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
+          ),
         ),
       ),
     );
