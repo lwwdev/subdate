@@ -50,7 +50,7 @@ class _PaymentsCalendarState extends ConsumerState<PaymentsCalendar> {
     final today = dateOnly(ref.watch(nowProvider));
     final fx = ref.watch(fxProvider);
     final home = ref.watch(settingsProvider).homeCurrency;
-    final monthTotal = payments.values.expand((l) => l).fold(0.0, (t, s) => t + fx.convert(s.amount, s.currency, home));
+    final monthTotal = payments.values.expand((l) => l).fold(0.0, (t, s) => t + fx.convert(s.share, s.currency, home));
 
     final daysInMonth = DateTime(_month.year, _month.month + 1, 0).day;
     final weekStart = ref.watch(settingsProvider.select((s) => s.weekStart));

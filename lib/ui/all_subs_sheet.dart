@@ -152,11 +152,19 @@ class _Row extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final next = nextRenewal(s, now);
+    final next = nextCharge(s, now);
     final every = s.every == 1 ? s.cadence.label : 'every ${s.every} ${s.cadence.label.toLowerCase()}';
-    final when = s.paused ? 'paused' : '${s.trial ? 'trial ends' : 'renews'} ${relativeLabel(next, now)}';
+    final when = s.paused
+        ? 'paused'
+        : next == null
+            ? 'ended ${dayPill(s.endsOn!)}'
+            : s.endsOn != null
+                ? 'last charge ${relativeLabel(next, now)}'
+                : '${s.trial ? 'trial ends' : 'renews'} ${relativeLabel(next, now)}';
+    final split = s.people > 1 ? ' · split ${s.people} ways' : '';
+    final dim = s.paused || next == null;
     return Opacity(
-      opacity: s.paused ? 0.5 : 1,
+      opacity: dim ? 0.5 : 1,
       child: ListTile(
         onTap: onTap,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -164,13 +172,13 @@ class _Row extends StatelessWidget {
         leading: ServiceIcon(s, size: 42),
         title: Text(s.name, maxLines: 1, overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text('$every · $when', style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+        subtitle: Text('$every · $when$split', style: const TextStyle(color: AppColors.muted, fontSize: 12)),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(money(s.amount, s.currency), style: const TextStyle(fontWeight: FontWeight.w600)),
-            if (!s.paused)
+            if (!dim)
               Text(dayPill(next), style: const TextStyle(color: AppColors.muted, fontSize: 12)),
           ],
         ),

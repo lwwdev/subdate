@@ -80,7 +80,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     children: [
                       Text(money(s.amount, s.currency),
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                      if (s.currency != home)
+                      if (s.people > 1)
+                        Text('your share ${money(fx.convert(s.share, s.currency, home), home)}',
+                            style: const TextStyle(color: AppColors.muted, fontSize: 12))
+                      else if (s.currency != home)
                         Text('≈ ${money(fx.convert(s.amount, s.currency, home), home)}',
                             style: const TextStyle(color: AppColors.muted, fontSize: 12)),
                     ],
