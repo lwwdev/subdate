@@ -48,9 +48,17 @@ DateTime nextRenewal(Subscription s, DateTime from) {
   }
 }
 
+/// next charge, or null if it was cancelled before then
+DateTime? nextCharge(Subscription s, DateTime from) {
+  final d = nextRenewal(s, from);
+  return s.endsOn != null && d.isAfter(dateOnly(s.endsOn!)) ? null : d;
+}
+
 /// all renewal dates between start and end, both inclusive
 List<DateTime> occurrencesInRange(Subscription s, DateTime start, DateTime end) {
-  final a = dateOnly(start), b = dateOnly(end);
+  final a = dateOnly(start);
+  var b = dateOnly(end);
+  if (s.endsOn != null && s.endsOn!.isBefore(b)) b = dateOnly(s.endsOn!);
   final out = <DateTime>[];
   var n = _guessIndex(s, a);
   while (true) {
