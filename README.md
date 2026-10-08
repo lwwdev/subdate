@@ -4,6 +4,8 @@ tracks your subscriptions so you stop getting surprised by charges. flutter, run
 
 <img src="docs/screenshot.jpg" width="320" alt="screenshot">
 
+try it in the browser: https://lwwdev.github.io/subdate/
+
 ## what it does
 
 - "coming up" stack for the next 7 / 14 / 30 days, total converted to your home currency
@@ -13,7 +15,8 @@ tracks your subscriptions so you stop getting surprised by charges. flutter, run
 - mixed currencies, converted with ECB rates from [frankfurter](https://frankfurter.dev)
 - local reminders before something renews (ios + android)
 - free trials (reminds you before the first real charge) and pausing subs
-- spending breakdown per month / year
+- spending breakdown per month / year, split by category
+- full list with search, sort and category filter
 - backup + restore as json through the clipboard
 - everything stays on your device (hive), no account
 
@@ -27,6 +30,10 @@ flutter test
 ```
 
 android needs the SDK, ios needs xcode + cocoapods, the usual
+
+no mac? every push to main builds an apk and an unsigned ios build in CI, grab them from the
+run's artifacts on the actions tab. the unsigned .ipa needs re-signing (sideloadly, altstore etc) before it installs.
+the web build gets deployed to github pages from the same run.
 
 ## stack
 
